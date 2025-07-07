@@ -24,10 +24,14 @@ func (s *ScanUseCase) Scan(path string) (*entity.DirEntry, error) {
 		return nil, nil
 	}
 
-	return s.scanRecursive(path)
+	return s.buildDirEntry(path, true)
 }
 
-func (s *ScanUseCase) scanRecursive(path string) (*entity.DirEntry, error) {
+func (s *ScanUseCase) ScanNonRecursive(path string) (*entity.DirEntry, error) {
+	return s.buildDirEntry(path, false)
+}
+
+func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEntry, error) {
 	root := &entity.DirEntry{
 		Name:  filepath.Base(path),
 		Path:  path,
@@ -39,16 +43,17 @@ func (s *ScanUseCase) scanRecursive(path string) (*entity.DirEntry, error) {
 		return nil, err
 	}
 
-	for _, e := range entries {
-		if e.IsDir {
-			sub, err := s.scanRecursive(e.Path)
-			if err == nil {
-				root.Children = append(root.Children, sub)
-				root.Size += sub.Size
+	for _, entry := range entries {
+		if entry.IsDir && recursive {
+			subDir, err := s.buildDirEntry(entry.Path, recursive)
+			if err != nil {
+				continue
 			}
+			root.Children = append(root.Children, subDir)
+			root.Size += subDir.Size
 		} else {
-			root.Children = append(root.Children, &e)
-			root.Size += e.Size
+			root.Children = append(root.Children, &entry)
+			root.Size += entry.Size
 		}
 	}
 
