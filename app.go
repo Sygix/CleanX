@@ -5,7 +5,6 @@ import (
 	"cleanx/backend/scan/service"
 	"cleanx/backend/scan/usecase"
 	"context"
-	"log"
 )
 
 // App struct
@@ -22,15 +21,6 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	fs := service.NewLocalFileSystem()
-	scanner := usecase.NewScanUseCase(fs)
-
-	result, err := scanner.Scan("/home/simon/Documents/Cours/CleanX")
-	if err != nil {
-		log.Println("Erreur:", err)
-	} else {
-		log.Printf("Résultat:\n%+v\n", result)
-	}
 }
 
 // Scan function
