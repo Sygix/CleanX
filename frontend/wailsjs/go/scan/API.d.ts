@@ -3,3 +3,5 @@
 import {entity} from '../models';
 
 export function Scan(arg1:string):Promise<entity.DirEntry>;
+
+export function ScanNonRecursive(arg1:string):Promise<entity.DirEntry>;

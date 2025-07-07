@@ -1,5 +1,5 @@
 import './App.css';
-import { Scan } from '../wailsjs/go/main/App';
+import { Scan } from '../wailsjs/go/scan/API';
 import { entity } from '../wailsjs/go/models';
 import { useState } from 'react';
 
