@@ -5,6 +5,7 @@ import { useState } from 'react';
 import FolderExplorer from '../components/Explorer/FolderExplorer';
 import { useExplorerStore } from '../store/explorerStore';
 import { Scan } from '../../wailsjs/go/scan/API';
+import { useScanStore } from '../store/scanStore';
 
 export const Route = createFileRoute('/')({
   component: Index,
@@ -20,6 +21,7 @@ function Index() {
     try {
       if(selectedPath) {
         const res = await Scan(selectedPath);
+        useScanStore.getState().setScanResult(res);
         console.log('Scan completed:', res);
       }
     } catch (error) {
