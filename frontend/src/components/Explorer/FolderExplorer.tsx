@@ -5,15 +5,16 @@ import FolderNode from './FolderNode';
 import { useExplorerStore } from '../../store/explorerStore';
 
 const FolderExplorer = () => {
-  const { tree, setTree, expandedPaths, setExpandedPaths } = useExplorerStore(state => state);
+  const { tree, setTree, expandedPaths, setExpandedPaths } = useExplorerStore((state) => state);
 
   // The path to scan is always the last in expandedPaths, or root if empty
   const scanPath =
     expandedPaths.length > 0 ? expandedPaths[expandedPaths.length - 1] : tree?.path || '/';
 
   useEffect(() => {
+    if (tree) return;
     ScanNonRecursive('/').then(setTree);
-  }, []);
+  }, [setTree, tree]);
 
   const handleExpand = async (entry: entity.DirEntry, level: number) => {
     if (!entry.isDir) return;
