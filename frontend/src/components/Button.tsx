@@ -1,7 +1,25 @@
-const Button = () => {
-  return (
-    <div>Button</div>
-  )
+import { ButtonHTMLAttributes, forwardRef, ReactNode } from 'react';
+import clsxm from '../utils/clsxm';
+
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children?: ReactNode;
+  className?: string;
 }
 
-export default Button
+const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
+  const { children, className, ...rest } = props;
+  return (
+    <button
+      {...rest}
+      ref={ref}
+      className={clsxm(
+        className,
+        'font-semi bg-primary-500 hover:bg-primary-800 flex items-center gap-3 rounded-md px-6 py-3 text-sm text-white shadow-lg transition-colors duration-300 disabled:cursor-not-allowed disabled:bg-neutral-700'
+      )}
+    >
+      {children}
+    </button>
+  );
+});
+
+export default Button;
