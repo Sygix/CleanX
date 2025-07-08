@@ -8,6 +8,7 @@ type ExplorerState = {
   ) => void;
   expandedPaths: string[];
   setExpandedPaths: (paths: string[]) => void;
+  selectedPath?: string | null;
 };
 
 export const useExplorerStore = create<ExplorerState>((set) => ({
@@ -20,5 +21,10 @@ export const useExplorerStore = create<ExplorerState>((set) => ({
           : treeOrUpdater,
     })),
   expandedPaths: [],
-  setExpandedPaths: (paths) => set({ expandedPaths: paths }),
+  setExpandedPaths: (paths) => {
+    set((state) => ({
+      expandedPaths: paths,
+      selectedPath: paths.length > 0 ? paths[paths.length - 1] : state.tree?.path || '/',
+    }));
+  },
 }));
