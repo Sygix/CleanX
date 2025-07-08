@@ -1,12 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { ScanNonRecursive } from '../../../wailsjs/go/scan/API';
 import { entity } from '../../../wailsjs/go/models';
 import FolderNode from './FolderNode';
+import { useExplorerStore } from '../../store/explorerStore';
 
 const FolderExplorer = () => {
-  const [tree, setTree] = useState<entity.DirEntry | null>(null);
-  // expandedPaths: array from root to deepest expanded folder
-  const [expandedPaths, setExpandedPaths] = useState<string[]>([]);
+  const { tree, setTree, expandedPaths, setExpandedPaths } = useExplorerStore(state => state);
 
   // The path to scan is always the last in expandedPaths, or root if empty
   const scanPath =
@@ -53,7 +52,7 @@ const FolderExplorer = () => {
         <h5>Choisir un répertoire à analyser :</h5>
         <p className="text-xs text-gray-500">{scanPath}</p>
       </div>
-        <FolderNode entry={tree} level={0} expandedPaths={expandedPaths} onExpand={handleExpand} />
+      <FolderNode entry={tree} level={0} expandedPaths={expandedPaths} onExpand={handleExpand} />
     </div>
   );
 };
