@@ -1,26 +1,32 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import Button from '../components/Button';
 import { IconPlus } from '@tabler/icons-react';
 import { useState } from 'react';
 import FolderExplorer from '../components/Explorer/FolderExplorer';
+import { useExplorerStore } from '../store/explorerStore';
+import { Scan } from '../../wailsjs/go/scan/API';
 
 export const Route = createFileRoute('/')({
   component: Index,
 });
 
 function Index() {
+  const navigate = useNavigate();
+  const selectedPath = useExplorerStore(state => state.selectedPath);
   const [loading, setLoading] = useState(false);
 
   const handleScan = async () => {
     setLoading(true);
     try {
-      // Simulate a network scan
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      alert('Scan completed successfully!');
+      if(selectedPath) {
+        const res = await Scan(selectedPath);
+        console.log('Scan completed:', res);
+      }
     } catch (error) {
       console.error('Error during scan:', error);
     } finally {
       setLoading(false);
+      navigate({ to: '/scans' });
     }
   };
 

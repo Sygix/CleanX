@@ -5,5 +5,8 @@ export const Route = createFileRoute('/scans')({
 });
 
 function Scans() {
-  return <div className="p-2">Hello from Scans!</div>;
+  return <div className="flex h-full flex-col gap-5 p-5">
+    <h2>Mes scans</h2>
+    
+  </div>;
 }
