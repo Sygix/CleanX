@@ -5,14 +5,16 @@ import (
 	"cleanx/backend/scan/port"
 	"path/filepath"
 	"sort"
+	"sync"
 )
 
 type ScanUseCase struct {
-	fs port.FileSystemPort
+	fs      port.FileSystemPort
+	limiter port.ConcurrencyLimiter
 }
 
-func NewScanUseCase(fs port.FileSystemPort) *ScanUseCase {
-	return &ScanUseCase{fs: fs}
+func NewScanUseCase(fs port.FileSystemPort, limiter port.ConcurrencyLimiter) *ScanUseCase {
+	return &ScanUseCase{fs: fs, limiter: limiter}
 }
 
 func (s *ScanUseCase) Scan(path string) (*entity.DirEntry, error) {
@@ -43,19 +45,45 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 		return nil, err
 	}
 
-	for _, entry := range entries {
-		if entry.IsDir && recursive {
-			subDir, err := s.buildDirEntry(entry.Path, recursive)
-			if err != nil {
-				continue
-			}
-			root.Children = append(root.Children, subDir)
-			root.Size += subDir.Size
-		} else {
+	if !recursive {
+		for _, entry := range entries {
 			root.Children = append(root.Children, &entry)
 			root.Size += entry.Size
 		}
+		sort.SliceStable(root.Children, func(i, j int) bool {
+			return root.Children[i].Size > root.Children[j].Size
+		})
+		return root, nil
 	}
+
+	var (
+		wg sync.WaitGroup
+		mu sync.Mutex
+	)
+
+	for _, entry := range entries {
+		if entry.IsDir && recursive {
+			wg.Add(1)
+			s.limiter.Acquire()
+			go func(e entity.DirEntry) {
+				defer wg.Done()
+				subDir, err := s.buildDirEntry(e.Path, recursive)
+				s.limiter.Release()
+				if err == nil && subDir != nil {
+					mu.Lock()
+					root.Children = append(root.Children, subDir)
+					root.Size += subDir.Size
+					mu.Unlock()
+				}
+			}(entry)
+		} else {
+			mu.Lock()
+			root.Children = append(root.Children, &entry)
+			root.Size += entry.Size
+			mu.Unlock()
+		}
+	}
+	wg.Wait()
 
 	sort.SliceStable(root.Children, func(i, j int) bool {
 		return root.Children[i].Size > root.Children[j].Size

@@ -10,12 +10,11 @@ export const Route = createFileRoute('/scans')({
 function Scans() {
   const scanResult = useScanStore(state => state.scanResult);
 
-  // Helper to flatten all files (not dirs) recursively
   function getFiles(entry: entity.DirEntry | null): entity.DirEntry[] {
     if (!entry) return [];
     if (!entry.isDir) return [entry];
     if (!entry.children) return [];
-    return entry.children.flatMap(getFiles);
+    return entry.children.flatMap(getFiles).sort((a, b) => b.size - a.size);
   }
 
   const files = getFiles(scanResult);
