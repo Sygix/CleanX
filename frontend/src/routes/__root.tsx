@@ -1,20 +1,17 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { createRootRoute, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import bg from '../assets/images/w11.png'
+import Menu from '../components/layout/Menu'
 
 export const Route = createRootRoute({
   component: () => (
-    <main className='text-carbon-900 relative flex min-h-screen flex-col'>
+    <main className='text-carbon-800 relative min-h-screen h-screen inset-0'>
       <img src={bg} alt="background image" className='h-full w-full absolute -z-50 max-h-full object-cover'/>
-      <div className="p-2 flex gap-2">
-        <Link to="/" className="[&.active]:font-bold">
-          Home
-        </Link>{' '}
-        <Link to="/about" className="[&.active]:font-bold">
-          About
-        </Link>
+      <div className="flex p-6 gap-6 h-full overflow-y-scroll">
+        <div className='bg-white/60 backdrop-blur-3xl rounded-lg h-full w-80 shrink-0'><Menu/></div>
+        <div className='bg-white/60 backdrop-blur-3xl rounded-lg h-full min-w-xl grow'><Outlet /></div>
+        <div className='bg-white/60 backdrop-blur-3xl rounded-lg h-full w-80 shrink-0'>test</div>
       </div>
-      <Outlet />
       <TanStackRouterDevtools />
     </main>
   ),
