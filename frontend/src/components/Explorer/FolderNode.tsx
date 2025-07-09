@@ -19,21 +19,35 @@ const FolderNode = ({
   if (!entry) return null;
   const isExpanded = expandedPaths ? expandedPaths[level] === entry.path : false;
   const size = convertBytes(entry.size);
-  const sizeClass = size.includes('TB') ? 'text-red-500' :
-                    size.includes('GB') ? 'text-orange-500' :
-                    size.includes('MB') ? 'text-yellow-500' :
-                    size.includes('KB') ? 'text-green-500' :
-                    size.includes('B') ? 'text-blue-500' : '';
-  
+  const sizeClass = size.includes('TB')
+    ? 'text-red-500'
+    : size.includes('GB')
+      ? 'text-orange-500'
+      : size.includes('MB')
+        ? 'text-yellow-500'
+        : size.includes('KB')
+          ? 'text-green-500'
+          : size.includes('B')
+            ? 'text-blue-500'
+            : '';
 
   return (
     <div className="ml-4">
-      <div className={clsxm(entry.isDir && "cursor-pointer", "flex gap-2 items-center")} onClick={() => onExpand(entry, level)}>
-        {entry.isDir ? isExpanded ? <IconFolderFilled className={sizeClass} /> : <IconFolder className={sizeClass} /> : <IconFile className={sizeClass} />}
-        <span>{entry.name || entry.path}</span>
-        {showSize && (
-          <span className="text-xs text-gray-500 ml-2">{size}</span>
+      <div
+        className={clsxm(entry.isDir && 'cursor-pointer', 'flex items-center gap-2')}
+        onClick={() => onExpand(entry, level)}
+      >
+        {entry.isDir ? (
+          isExpanded ? (
+            <IconFolderFilled className={clsxm(showSize && sizeClass)} />
+          ) : (
+            <IconFolder className={clsxm(showSize && sizeClass)} />
+          )
+        ) : (
+          <IconFile className={clsxm(showSize && sizeClass)} />
         )}
+        <span>{entry.name || entry.path}</span>
+        {showSize && <span className="ml-2 text-xs text-gray-500">{size}</span>}
       </div>
       {entry.isDir && isExpanded && entry.children && (
         <div>

@@ -15,14 +15,14 @@ export const Route = createFileRoute(routePath)({
 
 function Index() {
   const navigate = useNavigate();
-  const {getExplorer, setTree} = useExplorerStore((state) => state);
+  const { getExplorer, setTree } = useExplorerStore((state) => state);
   const { tree, selectedPath } = getExplorer('index');
   const [loading, setLoading] = useState(false);
 
   const handleScan = async () => {
     setLoading(true);
     try {
-      if(selectedPath) {
+      if (selectedPath) {
         const res = await Scan(selectedPath);
         useScanStore.getState().setScanResult(res);
         console.log('Scan completed:', res);
@@ -37,8 +37,8 @@ function Index() {
 
   useEffect(() => {
     if (tree) return;
-    ScanNonRecursive(routePath).then((entry) => setTree("index", entry));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    ScanNonRecursive(routePath).then((entry) => setTree('index', entry));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

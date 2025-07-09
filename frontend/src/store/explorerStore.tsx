@@ -27,7 +27,9 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
           ...state.explorers[key],
           tree:
             typeof treeOrUpdater === 'function'
-              ? (treeOrUpdater as (prev: entity.DirEntry | null) => entity.DirEntry | null)(state.explorers[key]?.tree ?? null)
+              ? (treeOrUpdater as (prev: entity.DirEntry | null) => entity.DirEntry | null)(
+                  state.explorers[key]?.tree ?? null
+                )
               : treeOrUpdater,
         },
       },
@@ -39,9 +41,11 @@ export const useExplorerStore = create<ExplorerState>((set, get) => ({
         [key]: {
           ...state.explorers[key],
           expandedPaths: paths,
-          selectedPath: paths.length > 0 ? paths[paths.length - 1] : state.explorers[key]?.tree?.path || '/',
+          selectedPath:
+            paths.length > 0 ? paths[paths.length - 1] : state.explorers[key]?.tree?.path || '/',
         },
       },
     })),
-  getExplorer: (key) => get().explorers[key] || { tree: null, expandedPaths: [], selectedPath: undefined },
+  getExplorer: (key) =>
+    get().explorers[key] || { tree: null, expandedPaths: [], selectedPath: undefined },
 }));

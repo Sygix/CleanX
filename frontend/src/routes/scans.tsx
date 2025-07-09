@@ -7,12 +7,12 @@ export const Route = createFileRoute('/scans')({
 });
 
 function Scans() {
-  const scanResult = useScanStore(state => state.scanResult);
+  const scanResult = useScanStore((state) => state.scanResult);
 
   return (
     <div className="flex h-full flex-col gap-5 p-5">
       <h2>Mes scans</h2>
-      {scanResult && <FolderExplorer showSize tree={scanResult} explorerKey='scans' />}
+      {scanResult && <FolderExplorer showSize tree={scanResult} explorerKey="scans" />}
     </div>
   );
 }
