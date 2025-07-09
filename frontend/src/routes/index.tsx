@@ -1,19 +1,22 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import Button from '../components/Button';
 import { IconPlus } from '@tabler/icons-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import FolderExplorer from '../components/Explorer/FolderExplorer';
 import { useExplorerStore } from '../store/explorerStore';
-import { Scan } from '../../wailsjs/go/scan/API';
+import { Scan, ScanNonRecursive } from '../../wailsjs/go/scan/API';
 import { useScanStore } from '../store/scanStore';
 
-export const Route = createFileRoute('/')({
+const routePath = '/';
+
+export const Route = createFileRoute(routePath)({
   component: Index,
 });
 
 function Index() {
   const navigate = useNavigate();
-  const selectedPath = useExplorerStore(state => state.selectedPath);
+  const {getExplorer, setTree} = useExplorerStore((state) => state);
+  const { tree, selectedPath } = getExplorer('index');
   const [loading, setLoading] = useState(false);
 
   const handleScan = async () => {
@@ -32,6 +35,11 @@ function Index() {
     }
   };
 
+  useEffect(() => {
+    if (tree) return;
+    ScanNonRecursive(routePath).then((entry) => setTree("index", entry));
+  }, []);
+
   return (
     <div className="flex h-full flex-col gap-5 p-5">
       <div className="flex justify-between">
@@ -41,7 +49,7 @@ function Index() {
           <span>Nouveau Scan</span>
         </Button>
       </div>
-      <FolderExplorer />
+      {tree && <FolderExplorer tree={tree} explorerKey="index" />}
     </div>
   );
 }

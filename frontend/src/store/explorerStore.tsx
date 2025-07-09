@@ -1,30 +1,47 @@
 import { create } from 'zustand';
 import { entity } from '../../wailsjs/go/models';
 
-type ExplorerState = {
+type ExplorerSingleState = {
   tree: entity.DirEntry | null;
-  setTree: (
-    tree: entity.DirEntry | null | ((prev: entity.DirEntry | null) => entity.DirEntry | null)
-  ) => void;
-  expandedPaths: string[];
-  setExpandedPaths: (paths: string[]) => void;
+  expandedPaths?: string[];
   selectedPath?: string | null;
 };
 
-export const useExplorerStore = create<ExplorerState>((set) => ({
-  tree: null,
-  setTree: (treeOrUpdater) =>
+type ExplorerState = {
+  explorers: Record<string, ExplorerSingleState>;
+  setTree: (
+    key: string,
+    tree: entity.DirEntry | null | ((prev: entity.DirEntry | null) => entity.DirEntry | null)
+  ) => void;
+  setExpandedPaths: (key: string, paths: string[]) => void;
+  getExplorer: (key: string) => ExplorerSingleState;
+};
+
+export const useExplorerStore = create<ExplorerState>((set, get) => ({
+  explorers: {},
+  setTree: (key, treeOrUpdater) =>
     set((state) => ({
-      tree:
-        typeof treeOrUpdater === 'function'
-          ? (treeOrUpdater as (prev: entity.DirEntry | null) => entity.DirEntry | null)(state.tree)
-          : treeOrUpdater,
+      explorers: {
+        ...state.explorers,
+        [key]: {
+          ...state.explorers[key],
+          tree:
+            typeof treeOrUpdater === 'function'
+              ? (treeOrUpdater as (prev: entity.DirEntry | null) => entity.DirEntry | null)(state.explorers[key]?.tree ?? null)
+              : treeOrUpdater,
+        },
+      },
     })),
-  expandedPaths: [],
-  setExpandedPaths: (paths) => {
+  setExpandedPaths: (key, paths) =>
     set((state) => ({
-      expandedPaths: paths,
-      selectedPath: paths.length > 0 ? paths[paths.length - 1] : state.tree?.path || '/',
-    }));
-  },
+      explorers: {
+        ...state.explorers,
+        [key]: {
+          ...state.explorers[key],
+          expandedPaths: paths,
+          selectedPath: paths.length > 0 ? paths[paths.length - 1] : state.explorers[key]?.tree?.path || '/',
+        },
+      },
+    })),
+  getExplorer: (key) => get().explorers[key] || { tree: null, expandedPaths: [], selectedPath: undefined },
 }));

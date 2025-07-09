@@ -1,32 +1,34 @@
-import { useEffect } from 'react';
+import { useCallback } from 'react';
 import { ScanNonRecursive } from '../../../wailsjs/go/scan/API';
 import { entity } from '../../../wailsjs/go/models';
 import FolderNode from './FolderNode';
 import { useExplorerStore } from '../../store/explorerStore';
 
-const FolderExplorer = () => {
-  const { tree, setTree, expandedPaths, setExpandedPaths, selectedPath } = useExplorerStore(
-    (state) => state
-  );
+interface FolderExplorerProps {
+  tree: entity.DirEntry;
+  showSize?: boolean;
+  explorerKey: string;
+}
 
-  useEffect(() => {
-    if (tree) return;
-    ScanNonRecursive('/').then(setTree);
-  }, [setTree, tree]);
+const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, explorerKey}) => {
+  const { expandedPaths = [], selectedPath } = useExplorerStore(state => state.getExplorer(explorerKey));
+  const setExpandedPaths = useExplorerStore(state => state.setExpandedPaths);
+  const setTree = useExplorerStore(state => state.setTree);
 
-  const handleExpand = async (entry: entity.DirEntry, level: number) => {
+  const handleExpand = useCallback(async (entry: entity.DirEntry, level: number) => {
     if (!entry.isDir) return;
     if (entry.children) {
       if (expandedPaths[level] === entry.path) {
-        setExpandedPaths(expandedPaths.slice(0, level));
+        setExpandedPaths(explorerKey, expandedPaths.slice(0, level));
       } else {
-        setExpandedPaths([...expandedPaths.slice(0, level), entry.path]);
+        setExpandedPaths(explorerKey, [...expandedPaths.slice(0, level), entry.path]);
       }
       return;
     }
     const res = await ScanNonRecursive(entry.path);
     if (!res) return;
-    setTree((prevTree) => {
+    setTree(explorerKey, (prevTree) => {
+      if (!prevTree) return prevTree;
       const updateTree = (node: entity.DirEntry): entity.DirEntry => {
         if (node.path === entry.path) {
           return entity.DirEntry.createFrom({ ...node, children: res.children });
@@ -39,10 +41,10 @@ const FolderExplorer = () => {
         }
         return node;
       };
-      return prevTree ? updateTree(prevTree) : null;
+      return updateTree(prevTree);
     });
-    setExpandedPaths([...expandedPaths.slice(0, level), entry.path]);
-  };
+    setExpandedPaths(explorerKey, [...expandedPaths.slice(0, level), entry.path]);
+  }, [expandedPaths, explorerKey, setExpandedPaths, setTree]);
 
   if (!tree) return <div>Chargement de l'arborescence...</div>;
   return (
@@ -51,7 +53,7 @@ const FolderExplorer = () => {
         <h5>Choisir un répertoire à analyser :</h5>
         <p className="text-xs text-gray-500">{selectedPath}</p>
       </div>
-      <FolderNode entry={tree} level={0} expandedPaths={expandedPaths} onExpand={handleExpand} />
+      <FolderNode entry={tree} level={0} expandedPaths={expandedPaths} onExpand={handleExpand} showSize={showSize} />
     </div>
   );
 };
