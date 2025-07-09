@@ -48,9 +48,10 @@ func (a *API) Scan(path string) (*entity.DirEntry, error) {
 	scanResult, err := scanner.Scan(path)
 	scanResult.ID = result.ID
 	if err == nil {
+		scanResult.ID = result.ID
+		scanResult.ScanDate = result.ScanDate
+		scanResult.Status = "COMPLETED"
 		result = scanResult
-		result.ScanDate = time.Now().Format(time.RFC3339)
-		result.Status = "COMPLETED"
 	}
 
 	a.mu.Lock()
