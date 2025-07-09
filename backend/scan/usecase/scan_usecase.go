@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"sort"
 	"sync"
+	"time"
 )
 
 type ScanUseCase struct {
@@ -34,11 +35,14 @@ func (s *ScanUseCase) ScanNonRecursive(path string) (*entity.DirEntry, error) {
 }
 
 func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEntry, error) {
+	start := time.Now()
 	log.Printf("Scanning directory: %s", path)
 	root := &entity.DirEntry{
-		Name:  filepath.Base(path),
-		Path:  path,
-		IsDir: true,
+		Name:       filepath.Base(path),
+		Path:       path,
+		IsDir:      true,
+		TotalDirs:  0,
+		TotalFiles: 0,
 	}
 
 	entries, err := s.fs.ReadDir(path)
@@ -52,10 +56,17 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 			log.Printf("Scanned file: %s, Size: %d", entry.Path, entry.Size)
 			root.Children = append(root.Children, &entry)
 			root.Size += entry.Size
+			if entry.IsDir {
+				root.TotalDirs++
+			} else {
+				root.TotalFiles++
+			}
 		}
 		sort.SliceStable(root.Children, func(i, j int) bool {
 			return root.Children[i].Size > root.Children[j].Size
 		})
+		root.Elapsed = time.Since(start)
+		log.Printf("Finished scanning directory: %s, Total size: %d, Total directories: %d, Total files: %d, Elapsed time: %s", path, root.Size, root.TotalDirs, root.TotalFiles, root.Elapsed)
 		return root, nil
 	}
 
@@ -69,12 +80,13 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 			wg.Add(1)
 			go func(e entity.DirEntry) {
 				defer wg.Done()
-				log.Printf("Entering subdirectory: %s", e.Path)
 				subDir, err := s.buildDirEntry(e.Path, recursive)
 				if err == nil && subDir != nil {
 					mu.Lock()
 					root.Children = append(root.Children, subDir)
 					root.Size += subDir.Size
+					root.TotalDirs += subDir.TotalDirs + 1
+					root.TotalFiles += subDir.TotalFiles
 					mu.Unlock()
 				} else if err != nil {
 					log.Printf("Error scanning subdirectory %s: %v", e.Path, err)
@@ -85,6 +97,11 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 			mu.Lock()
 			root.Children = append(root.Children, &entry)
 			root.Size += entry.Size
+			if entry.IsDir {
+				root.TotalDirs++
+			} else {
+				root.TotalFiles++
+			}
 			mu.Unlock()
 		}
 	}
@@ -94,6 +111,7 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 		return root.Children[i].Size > root.Children[j].Size
 	})
 
-	log.Printf("Finished scanning directory: %s, Total size: %d", path, root.Size)
+	root.Elapsed = time.Since(start)
+	log.Printf("Finished scanning directory: %s, Total size: %d, Total directories: %d, Total files: %d, Elapsed time: %s", path, root.Size, root.TotalDirs, root.TotalFiles, root.Elapsed)
 	return root, nil
 }

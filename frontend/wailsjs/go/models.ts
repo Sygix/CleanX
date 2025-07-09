@@ -6,6 +6,9 @@ export namespace entity {
 	    size: number;
 	    isDir: boolean;
 	    children?: DirEntry[];
+	    elapsed: number;
+	    totalDirs: number;
+	    totalFiles: number;
 	
 	    static createFrom(source: any = {}) {
 	        return new DirEntry(source);
@@ -18,6 +21,9 @@ export namespace entity {
 	        this.size = source["size"];
 	        this.isDir = source["isDir"];
 	        this.children = this.convertValues(source["children"], DirEntry);
+	        this.elapsed = source["elapsed"];
+	        this.totalDirs = source["totalDirs"];
+	        this.totalFiles = source["totalFiles"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
