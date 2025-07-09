@@ -9,12 +9,14 @@ const FolderNode = ({
   expandedPaths,
   onExpand,
   showSize = false,
+  showFiles = true,
 }: {
   entry: entity.DirEntry;
   level: number;
   expandedPaths?: string[];
   onExpand: (entry: entity.DirEntry, level: number) => void;
   showSize?: boolean;
+  showFiles?: boolean;
 }) => {
   if (!entry) return null;
   const isExpanded = expandedPaths ? expandedPaths[level] === entry.path : false;
@@ -31,6 +33,7 @@ const FolderNode = ({
             ? 'text-blue-500'
             : '';
 
+  if (!showFiles && !entry.isDir) return null;
   return (
     <div className="ml-4">
       <div
@@ -59,6 +62,7 @@ const FolderNode = ({
               expandedPaths={expandedPaths}
               onExpand={onExpand}
               showSize={showSize}
+              showFiles={showFiles}
             />
           ))}
         </div>

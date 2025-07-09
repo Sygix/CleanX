@@ -7,10 +7,11 @@ import { useExplorerStore } from '../../store/explorerStore';
 interface FolderExplorerProps {
   tree: entity.DirEntry;
   showSize?: boolean;
+  showFiles?: boolean;
   explorerKey: string;
 }
 
-const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, explorerKey }) => {
+const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, showFiles, explorerKey }) => {
   const { getExplorer } = useExplorerStore((state) => state);
   const { expandedPaths = [], selectedPath } = getExplorer(explorerKey);
   const setExpandedPaths = useExplorerStore((state) => state.setExpandedPaths);
@@ -63,6 +64,7 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, explore
         expandedPaths={expandedPaths}
         onExpand={handleExpand}
         showSize={showSize}
+        showFiles={showFiles}
       />
     </div>
   );

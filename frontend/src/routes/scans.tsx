@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useScanStore } from '../store/scanStore';
-import FolderExplorer from '../components/Explorer/FolderExplorer';
+import FolderExplorer from '../components/explorer/FolderExplorer';
 
 export const Route = createFileRoute('/scans')({
   component: Scans,

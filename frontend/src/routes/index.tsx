@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import Button from '../components/Button';
-import { IconPlus } from '@tabler/icons-react';
+import { IconPlus, IconRefresh } from '@tabler/icons-react';
 import { useEffect, useState } from 'react';
-import FolderExplorer from '../components/Explorer/FolderExplorer';
+import FolderExplorer from '../components/explorer/FolderExplorer';
 import { useExplorerStore } from '../store/explorerStore';
 import { Scan, ScanNonRecursive } from '../../wailsjs/go/scan/API';
 import { useScanStore } from '../store/scanStore';
@@ -35,9 +35,13 @@ function Index() {
     }
   };
 
+  const refreshTree = () => {
+    ScanNonRecursive(routePath).then((entry) => setTree('index', entry));
+  }
+
   useEffect(() => {
     if (tree) return;
-    ScanNonRecursive(routePath).then((entry) => setTree('index', entry));
+    refreshTree();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -45,12 +49,18 @@ function Index() {
     <div className="flex h-full flex-col gap-5 p-5">
       <div className="flex justify-between">
         <h2>Scanner</h2>
+        <div className='flex gap-5'>
         <Button onClick={handleScan} disabled={loading}>
           <IconPlus />
           <span>Nouveau Scan</span>
         </Button>
+        <Button onClick={refreshTree} disabled={loading} className='bg-transparent text-neutral-800 hover:bg-primary-200'>
+          <IconRefresh />
+        </Button>
+        </div>
+        
       </div>
-      {tree && <FolderExplorer tree={tree} explorerKey="index" />}
+      {tree && <FolderExplorer tree={tree} explorerKey="index" showFiles={false} />}
     </div>
   );
 }
