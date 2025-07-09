@@ -5,6 +5,9 @@ import (
 	"cleanx/backend/scan/service"
 	"cleanx/backend/scan/usecase"
 	"sync"
+	"time"
+
+	"github.com/google/uuid"
 )
 
 type API struct {
@@ -25,6 +28,8 @@ func (a *API) Scan(path string) (*entity.DirEntry, error) {
 	scanner := usecase.NewScanUseCase(a.fs)
 	result, err := scanner.Scan(path)
 	if err == nil {
+		result.ID = uuid.New().String()
+		result.ScanDate = time.Now()
 		a.mu.Lock()
 		a.cache[path] = result
 		a.mu.Unlock()

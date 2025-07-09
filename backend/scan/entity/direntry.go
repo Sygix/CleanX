@@ -3,6 +3,8 @@ package entity
 import "time"
 
 type DirEntry struct {
+	ID         string        `json:"id"`
+	ScanDate   time.Time     `json:"scanDate"`
 	Name       string        `json:"name"`
 	Path       string        `json:"path"`
 	Size       int64         `json:"size"`
