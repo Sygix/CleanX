@@ -29,7 +29,7 @@ func (a *API) Scan(path string) (*entity.DirEntry, error) {
 	result, err := scanner.Scan(path)
 	if err == nil {
 		result.ID = uuid.New().String()
-		result.ScanDate = time.Now()
+		result.ScanDate = time.Now().Format(time.RFC3339)
 		a.mu.Lock()
 		a.cache[path] = result
 		a.mu.Unlock()
@@ -42,19 +42,28 @@ func (a *API) ScanNonRecursive(path string) (*entity.DirEntry, error) {
 	return scanner.ScanNonRecursive(path)
 }
 
-func (a *API) ListScans() []string {
+func (a *API) ListScans() []entity.ScanSummary {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
-	paths := make([]string, 0, len(a.cache))
-	for path := range a.cache {
-		paths = append(paths, path)
+
+	scans := make([]entity.ScanSummary, 0, len(a.cache))
+	for path, entry := range a.cache {
+		scans = append(scans, entity.ScanSummary{
+			ID:       entry.ID,
+			ScanDate: entry.ScanDate,
+			Path:     path,
+		})
 	}
-	return paths
+	return scans
 }
 
-func (a *API) GetScan(path string) (*entity.DirEntry, bool) {
+func (a *API) GetScan(id string) *entity.DirEntry {
 	a.mu.RLock()
 	defer a.mu.RUnlock()
-	result, exists := a.cache[path]
-	return result, exists
+	for _, entry := range a.cache {
+		if entry.ID == id {
+			return entry
+		}
+	}
+	return nil
 }
