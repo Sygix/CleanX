@@ -11,7 +11,8 @@ interface FolderExplorerProps {
 }
 
 const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, explorerKey}) => {
-  const { expandedPaths = [], selectedPath } = useExplorerStore(state => state.getExplorer(explorerKey));
+  const { getExplorer } = useExplorerStore(state => state);
+  const { expandedPaths = [], selectedPath } = getExplorer(explorerKey);
   const setExpandedPaths = useExplorerStore(state => state.setExpandedPaths);
   const setTree = useExplorerStore(state => state.setTree);
 
@@ -50,7 +51,7 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, explore
   return (
     <div className="flex flex-col gap-2 overflow-scroll">
       <div className="flex items-center gap-2">
-        <h5>Choisir un répertoire à analyser :</h5>
+        <h5>Répertoire sélectionné :</h5>
         <p className="text-xs text-gray-500">{selectedPath}</p>
       </div>
       <FolderNode entry={tree} level={0} expandedPaths={expandedPaths} onExpand={handleExpand} showSize={showSize} />

@@ -1,6 +1,7 @@
 import { IconFile, IconFolder, IconFolderFilled } from '@tabler/icons-react';
 import { entity } from '../../../wailsjs/go/models';
 import { convertBytes } from '../../utils/convertBytes';
+import clsxm from '../../utils/clsxm';
 
 const FolderNode = ({
   entry,
@@ -17,14 +18,21 @@ const FolderNode = ({
 }) => {
   if (!entry) return null;
   const isExpanded = expandedPaths ? expandedPaths[level] === entry.path : false;
+  const size = convertBytes(entry.size);
+  const sizeClass = size.includes('TB') ? 'text-red-500' :
+                    size.includes('GB') ? 'text-orange-500' :
+                    size.includes('MB') ? 'text-yellow-500' :
+                    size.includes('KB') ? 'text-green-500' :
+                    size.includes('B') ? 'text-blue-500' : '';
+  
 
   return (
     <div className="ml-4">
-      <div className="flex cursor-pointer gap-2 items-center" onClick={() => onExpand(entry, level)}>
-        {entry.isDir ? isExpanded ? <IconFolderFilled /> : <IconFolder /> : <IconFile />}
+      <div className={clsxm(entry.isDir && "cursor-pointer", "flex gap-2 items-center")} onClick={() => onExpand(entry, level)}>
+        {entry.isDir ? isExpanded ? <IconFolderFilled className={sizeClass} /> : <IconFolder className={sizeClass} /> : <IconFile className={sizeClass} />}
         <span>{entry.name || entry.path}</span>
         {showSize && (
-          <span className="text-xs text-gray-500 ml-2">{convertBytes(entry.size)}</span>
+          <span className="text-xs text-gray-500 ml-2">{size}</span>
         )}
       </div>
       {entry.isDir && isExpanded && entry.children && (
