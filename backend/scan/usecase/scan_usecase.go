@@ -10,12 +10,11 @@ import (
 )
 
 type ScanUseCase struct {
-	fs      port.FileSystemPort
-	limiter port.ConcurrencyLimiter
+	fs port.FileSystemPort
 }
 
-func NewScanUseCase(fs port.FileSystemPort, limiter port.ConcurrencyLimiter) *ScanUseCase {
-	return &ScanUseCase{fs: fs, limiter: limiter}
+func NewScanUseCase(fs port.FileSystemPort) *ScanUseCase {
+	return &ScanUseCase{fs: fs}
 }
 
 func (s *ScanUseCase) Scan(path string) (*entity.DirEntry, error) {
@@ -68,12 +67,10 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 	for _, entry := range entries {
 		if entry.IsDir && recursive {
 			wg.Add(1)
-			s.limiter.Acquire()
 			go func(e entity.DirEntry) {
 				defer wg.Done()
 				log.Printf("Entering subdirectory: %s", e.Path)
 				subDir, err := s.buildDirEntry(e.Path, recursive)
-				s.limiter.Release()
 				if err == nil && subDir != nil {
 					mu.Lock()
 					root.Children = append(root.Children, subDir)
@@ -97,5 +94,6 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 		return root.Children[i].Size > root.Children[j].Size
 	})
 
+	log.Printf("Finished scanning directory: %s, Total size: %d", path, root.Size)
 	return root, nil
 }
