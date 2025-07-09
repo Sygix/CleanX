@@ -13,8 +13,10 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
+	ctx := context.Background()
 	return &App{
-		ScanAPI: scan.NewAPI(),
+		ctx:     ctx,
+		ScanAPI: scan.NewAPI(ctx),
 	}
 }
 
@@ -22,4 +24,5 @@ func NewApp() *App {
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	a.ScanAPI.SetContext(ctx)
 }

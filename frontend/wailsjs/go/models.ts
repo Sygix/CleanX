@@ -11,6 +11,7 @@ export namespace entity {
 	    elapsed: number;
 	    totalDirs: number;
 	    totalFiles: number;
+	    status: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new DirEntry(source);
@@ -28,6 +29,7 @@ export namespace entity {
 	        this.elapsed = source["elapsed"];
 	        this.totalDirs = source["totalDirs"];
 	        this.totalFiles = source["totalFiles"];
+	        this.status = source["status"];
 	    }
 	
 		convertValues(a: any, classs: any, asMap: boolean = false): any {
@@ -52,6 +54,7 @@ export namespace entity {
 	    id: string;
 	    scanDate: string;
 	    path: string;
+	    status: string;
 	
 	    static createFrom(source: any = {}) {
 	        return new ScanSummary(source);
@@ -62,6 +65,7 @@ export namespace entity {
 	        this.id = source["id"];
 	        this.scanDate = source["scanDate"];
 	        this.path = source["path"];
+	        this.status = source["status"];
 	    }
 	}
 

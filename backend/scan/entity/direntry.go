@@ -13,4 +13,5 @@ type DirEntry struct {
 	Elapsed    time.Duration `json:"elapsed"`
 	TotalDirs  int           `json:"totalDirs"`
 	TotalFiles int           `json:"totalFiles"`
+	Status     string        `json:"status"`
 }

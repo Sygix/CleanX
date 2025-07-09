@@ -17,3 +17,11 @@ export function Scan(arg1) {
 export function ScanNonRecursive(arg1) {
   return window['go']['scan']['API']['ScanNonRecursive'](arg1);
 }
+
+export function SetContext(arg1) {
+  return window['go']['scan']['API']['SetContext'](arg1);
+}
+
+export function UpdateScanStatus(arg1, arg2) {
+  return window['go']['scan']['API']['UpdateScanStatus'](arg1, arg2);
+}

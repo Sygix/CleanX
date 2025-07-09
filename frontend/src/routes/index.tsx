@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import Button from '../components/Button';
 import { IconPlus, IconRefresh } from '@tabler/icons-react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import FolderExplorer from '../components/explorer/FolderExplorer';
 import { useExplorerStore } from '../store/explorerStore';
 import { Scan, ScanNonRecursive } from '../../wailsjs/go/scan/API';
@@ -16,18 +16,15 @@ function Index() {
   const navigate = useNavigate();
   const { getExplorer, setTree } = useExplorerStore((state) => state);
   const { tree, selectedPath } = getExplorer('index');
-  const [loading, setLoading] = useState(false);
 
-  const handleScan = async () => {
-    setLoading(true);
+  const handleScan = () => {
     try {
       if (selectedPath) {
-        await Scan(selectedPath);
+        Scan(selectedPath)
       }
     } catch (error) {
-      console.error('Error during scan:', error);
+      console.error('Error handleScan:', error);
     } finally {
-      setLoading(false);
       navigate({ to: '/scans' });
     }
   };
@@ -47,11 +44,11 @@ function Index() {
       <div className="flex justify-between">
         <h2>Scanner</h2>
         <div className='flex gap-5'>
-        <Button onClick={handleScan} disabled={loading}>
+        <Button onClick={handleScan}>
           <IconPlus />
           <span>Nouveau Scan</span>
         </Button>
-        <Button onClick={refreshTree} disabled={loading} className='bg-transparent text-neutral-800 hover:bg-primary-200'>
+        <Button onClick={refreshTree} className='bg-transparent text-neutral-800 hover:bg-primary-200'>
           <IconRefresh />
         </Button>
         </div>

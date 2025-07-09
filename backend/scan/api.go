@@ -4,36 +4,61 @@ import (
 	"cleanx/backend/scan/entity"
 	"cleanx/backend/scan/service"
 	"cleanx/backend/scan/usecase"
+	"context"
 	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type API struct {
 	fs    *service.LocalFileSystem
 	cache map[string]*entity.DirEntry
 	mu    sync.RWMutex
+	ctx   context.Context
 }
 
-func NewAPI() *API {
+func NewAPI(ctx context.Context) *API {
 	fs := service.NewLocalFileSystem()
 	return &API{
 		fs:    fs,
 		cache: make(map[string]*entity.DirEntry),
+		ctx:   ctx,
 	}
+}
+
+func (a *API) SetContext(ctx context.Context) {
+	a.ctx = ctx
 }
 
 func (a *API) Scan(path string) (*entity.DirEntry, error) {
 	scanner := usecase.NewScanUseCase(a.fs)
-	result, err := scanner.Scan(path)
-	if err == nil {
-		result.ID = uuid.New().String()
-		result.ScanDate = time.Now().Format(time.RFC3339)
-		a.mu.Lock()
-		a.cache[path] = result
-		a.mu.Unlock()
+	result := &entity.DirEntry{
+		ID:       uuid.New().String(),
+		ScanDate: time.Now().Format(time.RFC3339),
+		Status:   "IN-PROGRESS",
 	}
+	a.mu.Lock()
+	a.cache[path] = result
+	a.mu.Unlock()
+
+	a.UpdateScanStatus(result.ID, result.Status)
+
+	scanResult, err := scanner.Scan(path)
+	scanResult.ID = result.ID
+	if err == nil {
+		result = scanResult
+		result.ScanDate = time.Now().Format(time.RFC3339)
+		result.Status = "COMPLETED"
+	}
+
+	a.mu.Lock()
+	a.cache[path] = result
+	a.mu.Unlock()
+
+	a.UpdateScanStatus(result.ID, result.Status)
+
 	return result, err
 }
 
@@ -52,6 +77,7 @@ func (a *API) ListScans() []entity.ScanSummary {
 			ID:       entry.ID,
 			ScanDate: entry.ScanDate,
 			Path:     path,
+			Status:   entry.Status,
 		})
 	}
 	return scans
@@ -66,4 +92,8 @@ func (a *API) GetScan(id string) *entity.DirEntry {
 		}
 	}
 	return nil
+}
+
+func (a *API) UpdateScanStatus(id string, status string) {
+	runtime.EventsEmit(a.ctx, "scan-status-updated", map[string]string{"id": id, "status": status})
 }
