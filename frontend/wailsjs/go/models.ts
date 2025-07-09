@@ -1,6 +1,8 @@
 export namespace entity {
 	
 	export class DirEntry {
+	    id: string;
+	    scanDate: string;
 	    name: string;
 	    path: string;
 	    size: number;
@@ -16,6 +18,8 @@ export namespace entity {
 	
 	    constructor(source: any = {}) {
 	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.scanDate = source["scanDate"];
 	        this.name = source["name"];
 	        this.path = source["path"];
 	        this.size = source["size"];
@@ -43,6 +47,22 @@ export namespace entity {
 		    }
 		    return a;
 		}
+	}
+	export class ScanSummary {
+	    id: string;
+	    scanDate: string;
+	    path: string;
+	
+	    static createFrom(source: any = {}) {
+	        return new ScanSummary(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.id = source["id"];
+	        this.scanDate = source["scanDate"];
+	        this.path = source["path"];
+	    }
 	}
 
 }
