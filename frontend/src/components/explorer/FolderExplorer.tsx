@@ -53,7 +53,7 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, showFil
 
   if (!tree) return <div>Chargement de l'arborescence...</div>;
   return (
-    <div className="flex flex-col gap-2 overflow-scroll">
+    <div className="flex flex-col gap-2">
       <div className="flex items-center gap-2">
         <h5>Répertoire sélectionné :</h5>
         <p className="text-xs text-gray-500">{selectedPath}</p>

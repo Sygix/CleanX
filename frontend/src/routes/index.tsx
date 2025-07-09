@@ -5,7 +5,6 @@ import { useEffect, useState } from 'react';
 import FolderExplorer from '../components/explorer/FolderExplorer';
 import { useExplorerStore } from '../store/explorerStore';
 import { Scan, ScanNonRecursive } from '../../wailsjs/go/scan/API';
-import { useScanStore } from '../store/scanStore';
 
 const routePath = '/';
 
@@ -23,9 +22,7 @@ function Index() {
     setLoading(true);
     try {
       if (selectedPath) {
-        const res = await Scan(selectedPath);
-        useScanStore.getState().setScanResult(res);
-        console.log('Scan completed:', res);
+        await Scan(selectedPath);
       }
     } catch (error) {
       console.error('Error during scan:', error);
@@ -46,7 +43,7 @@ function Index() {
   }, []);
 
   return (
-    <div className="flex h-full flex-col gap-5 p-5">
+    <div className="flex h-full flex-col gap-5 p-5 overflow-scroll">
       <div className="flex justify-between">
         <h2>Scanner</h2>
         <div className='flex gap-5'>
