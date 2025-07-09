@@ -38,6 +38,7 @@ function Index() {
   useEffect(() => {
     if (tree) return;
     ScanNonRecursive(routePath).then((entry) => setTree("index", entry));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

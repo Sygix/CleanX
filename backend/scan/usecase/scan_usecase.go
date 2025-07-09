@@ -3,6 +3,7 @@ package usecase
 import (
 	"cleanx/backend/scan/entity"
 	"cleanx/backend/scan/port"
+	"log"
 	"path/filepath"
 	"sort"
 	"sync"
@@ -34,6 +35,7 @@ func (s *ScanUseCase) ScanNonRecursive(path string) (*entity.DirEntry, error) {
 }
 
 func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEntry, error) {
+	log.Printf("Scanning directory: %s", path)
 	root := &entity.DirEntry{
 		Name:  filepath.Base(path),
 		Path:  path,
@@ -42,11 +44,13 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 
 	entries, err := s.fs.ReadDir(path)
 	if err != nil {
+		log.Printf("Error reading directory %s: %v", path, err)
 		return nil, err
 	}
 
 	if !recursive {
 		for _, entry := range entries {
+			log.Printf("Scanned file: %s, Size: %d", entry.Path, entry.Size)
 			root.Children = append(root.Children, &entry)
 			root.Size += entry.Size
 		}
@@ -67,6 +71,7 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 			s.limiter.Acquire()
 			go func(e entity.DirEntry) {
 				defer wg.Done()
+				log.Printf("Entering subdirectory: %s", e.Path)
 				subDir, err := s.buildDirEntry(e.Path, recursive)
 				s.limiter.Release()
 				if err == nil && subDir != nil {
@@ -74,9 +79,12 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 					root.Children = append(root.Children, subDir)
 					root.Size += subDir.Size
 					mu.Unlock()
+				} else if err != nil {
+					log.Printf("Error scanning subdirectory %s: %v", e.Path, err)
 				}
 			}(entry)
 		} else {
+			log.Printf("Scanned file: %s, Size: %d", entry.Path, entry.Size)
 			mu.Lock()
 			root.Children = append(root.Children, &entry)
 			root.Size += entry.Size
