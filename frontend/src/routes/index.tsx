@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import Button from '../components/Button';
 import { IconPlus, IconRefresh } from '@tabler/icons-react';
 import { useCallback, useEffect, useState } from 'react';
@@ -14,21 +14,14 @@ export const Route = createFileRoute(routePath)({
 });
 
 function Index() {
-  const navigate = useNavigate();
   const { drives, loading } = useDrives();
   const [selectedDrive, setSelectedDrive] = useState<string | null>(null);
   const { getExplorer, setTree } = useExplorerStore((state) => state);
   const { tree, selectedPath } = getExplorer('index');
 
   const handleScan = () => {
-    try {
-      if (selectedPath) {
-        Scan(selectedPath);
-      }
-    } catch (error) {
-      console.error('Error handleScan:', error);
-    } finally {
-      navigate({ to: '/scans' });
+    if (selectedPath) {
+      Scan(selectedPath);
     }
   };
 

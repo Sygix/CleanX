@@ -8,97 +8,97 @@
 // You should NOT make any changes in this file as it will be overwritten.
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
-import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as ScansIndexRouteImport } from './routes/scans/index'
-import { Route as ScansScanIdRouteImport } from './routes/scans/$scanId'
+import { Route as rootRouteImport } from './routes/__root';
+import { Route as SettingsRouteImport } from './routes/settings';
+import { Route as IndexRouteImport } from './routes/index';
+import { Route as ScansIndexRouteImport } from './routes/scans/index';
+import { Route as ScansScanIdRouteImport } from './routes/scans/$scanId';
 
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ScansIndexRoute = ScansIndexRouteImport.update({
   id: '/scans/',
   path: '/scans/',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 const ScansScanIdRoute = ScansScanIdRouteImport.update({
   id: '/scans/$scanId',
   path: '/scans/$scanId',
   getParentRoute: () => rootRouteImport,
-} as any)
+} as any);
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/settings': typeof SettingsRoute
-  '/scans/$scanId': typeof ScansScanIdRoute
-  '/scans': typeof ScansIndexRoute
+  '/': typeof IndexRoute;
+  '/settings': typeof SettingsRoute;
+  '/scans/$scanId': typeof ScansScanIdRoute;
+  '/scans': typeof ScansIndexRoute;
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/settings': typeof SettingsRoute
-  '/scans/$scanId': typeof ScansScanIdRoute
-  '/scans': typeof ScansIndexRoute
+  '/': typeof IndexRoute;
+  '/settings': typeof SettingsRoute;
+  '/scans/$scanId': typeof ScansScanIdRoute;
+  '/scans': typeof ScansIndexRoute;
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/settings': typeof SettingsRoute
-  '/scans/$scanId': typeof ScansScanIdRoute
-  '/scans/': typeof ScansIndexRoute
+  __root__: typeof rootRouteImport;
+  '/': typeof IndexRoute;
+  '/settings': typeof SettingsRoute;
+  '/scans/$scanId': typeof ScansScanIdRoute;
+  '/scans/': typeof ScansIndexRoute;
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/settings' | '/scans/$scanId' | '/scans'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/settings' | '/scans/$scanId' | '/scans'
-  id: '__root__' | '/' | '/settings' | '/scans/$scanId' | '/scans/'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: '/' | '/settings' | '/scans/$scanId' | '/scans';
+  fileRoutesByTo: FileRoutesByTo;
+  to: '/' | '/settings' | '/scans/$scanId' | '/scans';
+  id: '__root__' | '/' | '/settings' | '/scans/$scanId' | '/scans/';
+  fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  SettingsRoute: typeof SettingsRoute
-  ScansScanIdRoute: typeof ScansScanIdRoute
-  ScansIndexRoute: typeof ScansIndexRoute
+  IndexRoute: typeof IndexRoute;
+  SettingsRoute: typeof SettingsRoute;
+  ScansScanIdRoute: typeof ScansScanIdRoute;
+  ScansIndexRoute: typeof ScansIndexRoute;
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
     '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/settings';
+      path: '/settings';
+      fullPath: '/settings';
+      preLoaderRoute: typeof SettingsRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/';
+      path: '/';
+      fullPath: '/';
+      preLoaderRoute: typeof IndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/scans/': {
-      id: '/scans/'
-      path: '/scans'
-      fullPath: '/scans'
-      preLoaderRoute: typeof ScansIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/scans/';
+      path: '/scans';
+      fullPath: '/scans';
+      preLoaderRoute: typeof ScansIndexRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
     '/scans/$scanId': {
-      id: '/scans/$scanId'
-      path: '/scans/$scanId'
-      fullPath: '/scans/$scanId'
-      preLoaderRoute: typeof ScansScanIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
+      id: '/scans/$scanId';
+      path: '/scans/$scanId';
+      fullPath: '/scans/$scanId';
+      preLoaderRoute: typeof ScansScanIdRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
@@ -107,7 +107,7 @@ const rootRouteChildren: RootRouteChildren = {
   SettingsRoute: SettingsRoute,
   ScansScanIdRoute: ScansScanIdRoute,
   ScansIndexRoute: ScansIndexRoute,
-}
+};
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();

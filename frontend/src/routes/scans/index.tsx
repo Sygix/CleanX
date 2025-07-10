@@ -15,8 +15,11 @@ function Scans() {
     console.log('Fetching scans...');
     try {
       const data = await ListScans();
-      setScans(data);
-      console.log('Scans fetched:', data);
+      const sortedData = [...data].sort(
+        (a, b) => new Date(b.scanDate).getTime() - new Date(a.scanDate).getTime()
+      );
+      setScans(sortedData);
+      console.log('Scans fetched:', sortedData);
     } catch (error) {
       console.error('Error fetching scans:', error);
     }
@@ -25,24 +28,37 @@ function Scans() {
   useEffect(() => {
     fetchScans();
 
-    const unsubscribe = EventsOn('scan-status-updated', (updatedScan) => {
-      console.log('Scan status updated:', updatedScan);
-      setScans((prevScans) => {
-        if (!prevScans) return prevScans;
-        return prevScans.map((scan) =>
-          scan.id === updatedScan.id ? { ...scan, status: updatedScan.status } : scan
-        );
-      });
-    });
+    const statusUpdateUnsubscribe = EventsOn(
+      'scan-status-updated',
+      (updatedScan: entity.ScanSummary) => {
+        setScans((prevScans) => {
+          if (!prevScans) return [updatedScan];
+          const scanExists = prevScans.some((scan) => scan.id === updatedScan.id);
+
+          if (scanExists) {
+            return prevScans
+              .map((scan) =>
+                scan.id === updatedScan.id ? { ...scan, status: updatedScan.status } : scan
+              )
+              .sort((a, b) => new Date(b.scanDate).getTime() - new Date(a.scanDate).getTime());
+          } else {
+            const newScans = [updatedScan, ...prevScans];
+            return newScans.sort(
+              (a, b) => new Date(b.scanDate).getTime() - new Date(a.scanDate).getTime()
+            );
+          }
+        });
+      }
+    );
 
     return () => {
-      unsubscribe();
+      statusUpdateUnsubscribe();
     };
   }, []);
 
   return (
     <div className="flex h-full flex-col gap-5 p-5">
-      <h2>Mes scans</h2>
+      <h2>Explorer mes scans</h2>
       <ul className="flex flex-col gap-2 overflow-auto">
         {scans === null ? (
           <li className="text-neutral-500">Chargement des scans...</li>

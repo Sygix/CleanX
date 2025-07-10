@@ -51,15 +51,20 @@ const ScanId = () => {
       {tree && (
         <div className="flex flex-col gap-2.5">
           <button
-            className="hover:bg-primary-200 flex cursor-pointer items-center justify-between gap-3 rounded-md p-2 px-6 py-3 transition-colors duration-300"
+            className="hover:bg-primary-200 flex cursor-pointer items-center justify-between gap-3 rounded-md border border-neutral-200 p-2 px-3 py-2 transition-colors duration-300 hover:border-transparent"
             onClick={() => handleChartExpand('treemap')}
-          ><span>Fichiers les plus volumineux :</span>
-            <IconChevronDown className={clsxm('transition-transform duration-300', expandedChart === 'treemap' && 'rotate-180')} />
-            
+          >
+            <span>Fichiers les plus volumineux :</span>
+            <IconChevronDown
+              className={clsxm(
+                'transition-transform duration-300',
+                expandedChart === 'treemap' && 'rotate-180'
+              )}
+            />
           </button>
           {expandedChart === 'treemap' && (
             <div className="min-h-56 overflow-hidden rounded-md shadow">
-              <TopFilesTreemap tree={tree} top={20} />
+              <TopFilesTreemap tree={tree} top={10} />
             </div>
           )}
         </div>
@@ -67,11 +72,16 @@ const ScanId = () => {
       {tree && (
         <div className="flex flex-col gap-2.5">
           <button
-            className="hover:bg-primary-200 flex cursor-pointer items-center justify-between gap-3 rounded-md p-2 px-6 py-3 transition-colors duration-300"
+            className="hover:bg-primary-200 flex cursor-pointer items-center justify-between gap-3 rounded-md border border-neutral-200 p-2 px-3 py-2 transition-colors duration-300 hover:border-transparent"
             onClick={() => handleChartExpand('extensions')}
-          ><span>Extensions les plus fréquentes :</span>
-            <IconChevronDown className={clsxm('transition-transform duration-300', expandedChart === 'extensions' && 'rotate-180')} />
-            
+          >
+            <span>Extensions les plus fréquentes :</span>
+            <IconChevronDown
+              className={clsxm(
+                'transition-transform duration-300',
+                expandedChart === 'extensions' && 'rotate-180'
+              )}
+            />
           </button>
           {expandedChart === 'extensions' && (
             <div className="min-h-56">
@@ -83,11 +93,16 @@ const ScanId = () => {
       {tree && (
         <div className="flex flex-col gap-2.5">
           <button
-            className="hover:bg-primary-200 flex cursor-pointer items-center justify-between gap-3 rounded-md p-2 px-6 py-3 transition-colors duration-300"
+            className="hover:bg-primary-200 flex cursor-pointer items-center justify-between gap-3 rounded-md border border-neutral-200 p-2 px-3 py-2 transition-colors duration-300 hover:border-transparent"
             onClick={() => handleChartExpand('sizeDistribution')}
-          ><span>Distribution des tailles de fichiers :</span>
-            <IconChevronDown className={clsxm('transition-transform duration-300', expandedChart === 'sizeDistribution' && 'rotate-180')} />
-            
+          >
+            <span>Distribution des tailles de fichiers :</span>
+            <IconChevronDown
+              className={clsxm(
+                'transition-transform duration-300',
+                expandedChart === 'sizeDistribution' && 'rotate-180'
+              )}
+            />
           </button>
           {expandedChart === 'sizeDistribution' && (
             <div className="min-h-56">
