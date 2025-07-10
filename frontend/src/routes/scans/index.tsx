@@ -43,7 +43,7 @@ function Scans() {
   return (
     <div className="flex h-full flex-col gap-5 p-5">
       <h2>Mes scans</h2>
-      <ul className="flex flex-col gap-2 overflow-scroll">
+      <ul className="flex flex-col gap-2 overflow-auto">
         {scans === null ? (
           <li className="text-neutral-500">Chargement des scans...</li>
         ) : scans.length <= 0 ? (

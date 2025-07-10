@@ -57,7 +57,7 @@ function Index() {
   }, [drives, refreshTree, tree]);
 
   return (
-    <div className="flex h-full flex-col gap-5 overflow-scroll p-5">
+    <div className="flex h-full flex-col gap-5 overflow-auto p-5">
       <div className="flex justify-between">
         <h2>Scanner</h2>
         <div className="flex gap-5">
@@ -74,16 +74,16 @@ function Index() {
         </div>
       </div>
       {loading ? (
-        <label className='text-neutral-600 text-sm'>Chargement des disques...</label>
+        <label className="text-sm text-neutral-600">Chargement des disques...</label>
       ) : (
-        <div className="flex flex-col gap-1.5 text-neutral-600 text-sm">
+        <div className="flex flex-col gap-1.5 text-sm text-neutral-600">
           <label htmlFor="drive-select">Disque source :</label>
           <select
             id="drive-select"
             value={selectedDrive ?? ''}
             onChange={handleDriveChange}
             disabled={loading}
-            className='bg-white border border-neutral-300 rounded-md p-2.5'
+            className="rounded-md border border-neutral-300 bg-white p-2.5"
           >
             {drives.map((drive) => (
               <option key={drive} value={drive}>
