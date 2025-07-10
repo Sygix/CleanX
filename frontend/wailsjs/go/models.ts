@@ -50,6 +50,22 @@ export namespace entity {
 		    return a;
 		}
 	}
+	export class DiskStats {
+	    total: number;
+	    free: number;
+	    used: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new DiskStats(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.total = source["total"];
+	        this.free = source["free"];
+	        this.used = source["used"];
+	    }
+	}
 	export class ScanSummary {
 	    id: string;
 	    scanDate: string;

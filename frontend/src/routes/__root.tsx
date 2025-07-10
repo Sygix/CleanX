@@ -22,7 +22,7 @@ export const Route = createRootRoute({
           <Outlet />
         </div>
         <div className="flex h-full w-72 shrink-0 flex-col gap-6">
-          <DiskGauge used={120} total={1024} />
+          <DiskGauge />
           <LatestScans />
         </div>
       </div>

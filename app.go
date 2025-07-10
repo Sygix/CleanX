@@ -1,6 +1,8 @@
 package main
 
 import (
+	"cleanx/backend/disk"
+	disk_entity "cleanx/backend/disk/entity"
 	"cleanx/backend/scan"
 	"cleanx/backend/scan/entity"
 	"cleanx/backend/scan/service"
@@ -13,6 +15,7 @@ import (
 type App struct {
 	ctx     context.Context
 	ScanAPI *scan.API
+	Disk    *disk.DiskModule
 }
 
 // NewApp creates a new App application struct
@@ -32,6 +35,7 @@ func (a *App) startup(ctx context.Context) {
 	scanner := usecase.NewScanUseCase(fileSystem)
 
 	a.ScanAPI = scan.NewAPI(cache, eventEmitter, fileSystem, scanner)
+	a.Disk = disk.NewDiskModule()
 }
 
 func (a *App) Scan(path string) (*entity.DirEntry, error) {
@@ -67,4 +71,11 @@ func (a *App) ListDrives() ([]string, error) {
 		return nil, fmt.Errorf("ScanAPI not initialized")
 	}
 	return a.ScanAPI.ListDrives(), nil
+}
+
+func (a *App) GetSystemDiskUsage() (*disk_entity.DiskStats, error) {
+	if a.Disk == nil {
+		return nil, fmt.Errorf("Disk module not initialized")
+	}
+	return a.Disk.GetSystemDiskUsage()
 }

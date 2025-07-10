@@ -6,6 +6,10 @@ export function GetScan(arg1) {
   return window['go']['main']['App']['GetScan'](arg1);
 }
 
+export function GetSystemDiskUsage() {
+  return window['go']['main']['App']['GetSystemDiskUsage']();
+}
+
 export function ListDrives() {
   return window['go']['main']['App']['ListDrives']();
 }
