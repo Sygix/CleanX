@@ -31,7 +31,7 @@ func (a *App) startup(ctx context.Context) {
 	fileSystem := service.NewLocalFileSystem()
 	scanner := usecase.NewScanUseCase(fileSystem)
 
-	a.ScanAPI = scan.NewAPI(cache, eventEmitter, scanner)
+	a.ScanAPI = scan.NewAPI(cache, eventEmitter, fileSystem, scanner)
 }
 
 func (a *App) Scan(path string) (*entity.DirEntry, error) {
@@ -60,4 +60,11 @@ func (a *App) GetScan(id string) (*entity.DirEntry, error) {
 		return nil, fmt.Errorf("ScanAPI not initialized")
 	}
 	return a.ScanAPI.GetScan(id), nil
+}
+
+func (a *App) ListDrives() ([]string, error) {
+	if a.ScanAPI == nil {
+		return nil, fmt.Errorf("ScanAPI not initialized")
+	}
+	return a.ScanAPI.ListDrives(), nil
 }

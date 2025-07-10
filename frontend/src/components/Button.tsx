@@ -14,7 +14,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
       ref={ref}
       className={clsxm(
         'font-semi bg-primary-500 hover:bg-primary-800 flex items-center gap-3 rounded-md px-6 py-3 text-sm text-white shadow-lg transition-colors duration-300 disabled:cursor-not-allowed disabled:bg-neutral-700',
-        className,
+        className
       )}
     >
       {children}

@@ -11,7 +11,12 @@ interface FolderExplorerProps {
   explorerKey: string;
 }
 
-const FolderExplorer: React.FC<FolderExplorerProps> = ({ tree, showSize, showFiles, explorerKey }) => {
+const FolderExplorer: React.FC<FolderExplorerProps> = ({
+  tree,
+  showSize,
+  showFiles,
+  explorerKey,
+}) => {
   const { getExplorer } = useExplorerStore((state) => state);
   const { expandedPaths = [], selectedPath } = getExplorer(explorerKey);
   const setExpandedPaths = useExplorerStore((state) => state.setExpandedPaths);

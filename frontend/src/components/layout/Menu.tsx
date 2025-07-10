@@ -3,7 +3,7 @@ import { IconList, IconRadar, IconSettings } from '@tabler/icons-react';
 
 const Menu = () => {
   return (
-    <nav className="flex h-full flex-col gap-4 p-5 overflow-scroll">
+    <nav className="flex h-full flex-col gap-4 overflow-scroll p-5">
       <h1 className="w-full text-center">CleanX</h1>
       <ul className="flex flex-col gap-2.5">
         <li>

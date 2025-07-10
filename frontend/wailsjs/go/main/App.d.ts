@@ -4,6 +4,8 @@ import {entity} from '../models';
 
 export function GetScan(arg1:string):Promise<entity.DirEntry>;
 
+export function ListDrives():Promise<Array<string>>;
+
 export function ListScans():Promise<Array<entity.ScanSummary>>;
 
 export function Scan(arg1:string):Promise<entity.DirEntry>;

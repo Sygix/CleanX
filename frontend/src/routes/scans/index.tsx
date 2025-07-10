@@ -25,7 +25,7 @@ function Scans() {
   useEffect(() => {
     fetchScans();
 
-    const unsubscribe = EventsOn("scan-status-updated", (updatedScan) => {
+    const unsubscribe = EventsOn('scan-status-updated', (updatedScan) => {
       console.log('Scan status updated:', updatedScan);
       setScans((prevScans) => {
         if (!prevScans) return prevScans;
@@ -51,15 +51,25 @@ function Scans() {
         ) : (
           scans.map((scan, index) => (
             <li key={index}>
-              <Link to={`/scans/$scanId`} disabled={scan.status !== 'COMPLETED'} params={{ scanId: scan.id }} className='flex items-center justify-between p-2 hover:bg-primary-200 gap-3 rounded-md px-6 py-3 transition-colors duration-300'>
-                  <span>{scan.path}</span>
-                  <span className="text-sm text-neutral-500">{new Date(scan.scanDate).toLocaleString()}</span>
-                  <span className={`text-sm ${scan.status === 'IN-PROGRESS' ? 'text-yellow-500' : 'text-green-500'}`}>{scan.status}</span>
+              <Link
+                to={`/scans/$scanId`}
+                disabled={scan.status !== 'COMPLETED'}
+                params={{ scanId: scan.id }}
+                className="hover:bg-primary-200 flex items-center justify-between gap-3 rounded-md p-2 px-6 py-3 transition-colors duration-300"
+              >
+                <span>{scan.path}</span>
+                <span className="text-sm text-neutral-500">
+                  {new Date(scan.scanDate).toLocaleString()}
+                </span>
+                <span
+                  className={`text-sm ${scan.status === 'IN-PROGRESS' ? 'text-yellow-500' : 'text-green-500'}`}
+                >
+                  {scan.status}
+                </span>
               </Link>
             </li>
           ))
-        )
-      }
+        )}
       </ul>
     </div>
   );

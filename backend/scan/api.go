@@ -13,13 +13,15 @@ import (
 type API struct {
 	cache        port.CachePort
 	eventEmitter port.EventEmitterPort
+	fileSystem   port.FileSystemPort
 	scanner      *usecase.ScanUseCase
 }
 
-func NewAPI(cache port.CachePort, eventEmitter port.EventEmitterPort, scanner *usecase.ScanUseCase) *API {
+func NewAPI(cache port.CachePort, eventEmitter port.EventEmitterPort, fileSystem port.FileSystemPort, scanner *usecase.ScanUseCase) *API {
 	return &API{
 		cache:        cache,
 		eventEmitter: eventEmitter,
+		fileSystem:   fileSystem,
 		scanner:      scanner,
 	}
 }
@@ -81,4 +83,9 @@ func (a *API) GetScan(id string) *entity.DirEntry {
 		return nil
 	}
 	return dirEntry
+}
+
+func (a *API) ListDrives() []string {
+	drives, _ := a.fileSystem.ListDrives()
+	return drives
 }
