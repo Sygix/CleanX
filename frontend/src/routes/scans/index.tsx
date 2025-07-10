@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { ListScans } from '../../../wailsjs/go/scan/API';
+import { ListScans } from '../../../wailsjs/go/main/App';
 import { useEffect, useState } from 'react';
 import { entity } from '../../../wailsjs/go/models';
 import { EventsOn } from '../../../wailsjs/runtime/runtime';

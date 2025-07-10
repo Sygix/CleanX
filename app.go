@@ -2,7 +2,11 @@ package main
 
 import (
 	"cleanx/backend/scan"
+	"cleanx/backend/scan/entity"
+	"cleanx/backend/scan/service"
+	"cleanx/backend/scan/usecase"
 	"context"
+	"fmt"
 )
 
 // App struct
@@ -13,16 +17,47 @@ type App struct {
 
 // NewApp creates a new App application struct
 func NewApp() *App {
-	ctx := context.Background()
-	return &App{
-		ctx:     ctx,
-		ScanAPI: scan.NewAPI(ctx),
-	}
+	return &App{}
 }
 
 // startup is called when the app starts. The context is saved
 // so we can call the runtime methods
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-	a.ScanAPI.SetContext(ctx)
+
+	// Initialize the API with required dependencies
+	cache := service.NewInMemoryCache()
+	eventEmitter := service.NewEventEmitter(ctx)
+	fileSystem := service.NewLocalFileSystem()
+	scanner := usecase.NewScanUseCase(fileSystem)
+
+	a.ScanAPI = scan.NewAPI(cache, eventEmitter, scanner)
+}
+
+func (a *App) Scan(path string) (*entity.DirEntry, error) {
+	if a.ScanAPI == nil {
+		return nil, fmt.Errorf("ScanAPI not initialized")
+	}
+	return a.ScanAPI.Scan(path)
+}
+
+func (a *App) ScanNonRecursive(path string) (*entity.DirEntry, error) {
+	if a.ScanAPI == nil {
+		return nil, fmt.Errorf("ScanAPI not initialized")
+	}
+	return a.ScanAPI.ScanNonRecursive(path)
+}
+
+func (a *App) ListScans() ([]entity.ScanSummary, error) {
+	if a.ScanAPI == nil {
+		return nil, fmt.Errorf("ScanAPI not initialized")
+	}
+	return a.ScanAPI.ListScans(), nil
+}
+
+func (a *App) GetScan(id string) (*entity.DirEntry, error) {
+	if a.ScanAPI == nil {
+		return nil, fmt.Errorf("ScanAPI not initialized")
+	}
+	return a.ScanAPI.GetScan(id), nil
 }

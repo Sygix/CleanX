@@ -4,7 +4,7 @@ import { IconPlus, IconRefresh } from '@tabler/icons-react';
 import { useEffect } from 'react';
 import FolderExplorer from '../components/explorer/FolderExplorer';
 import { useExplorerStore } from '../store/explorerStore';
-import { Scan, ScanNonRecursive } from '../../wailsjs/go/scan/API';
+import { Scan, ScanNonRecursive } from '../../wailsjs/go/main/App';
 
 const routePath = '/';
 

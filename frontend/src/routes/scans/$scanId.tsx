@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { GetScan } from "../../../wailsjs/go/scan/API";
 import FolderExplorer from "../../components/explorer/FolderExplorer";
 import { formatDuration } from "../../utils/formatDuration";
+import { GetScan } from "../../../wailsjs/go/main/App";
 
 const ScanId = () => {
     const tree = Route.useLoaderData();

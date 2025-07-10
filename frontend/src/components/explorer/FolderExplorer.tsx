@@ -1,8 +1,8 @@
 import { useCallback } from 'react';
-import { ScanNonRecursive } from '../../../wailsjs/go/scan/API';
 import { entity } from '../../../wailsjs/go/models';
 import FolderNode from './FolderNode';
 import { useExplorerStore } from '../../store/explorerStore';
+import { ScanNonRecursive } from '../../../wailsjs/go/main/App';
 
 interface FolderExplorerProps {
   tree: entity.DirEntry;

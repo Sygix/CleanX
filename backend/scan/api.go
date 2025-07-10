@@ -2,99 +2,83 @@ package scan
 
 import (
 	"cleanx/backend/scan/entity"
-	"cleanx/backend/scan/service"
+	"cleanx/backend/scan/port"
 	"cleanx/backend/scan/usecase"
-	"context"
-	"sync"
+	"log"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 type API struct {
-	fs    *service.LocalFileSystem
-	cache map[string]*entity.DirEntry
-	mu    sync.RWMutex
-	ctx   context.Context
+	cache        port.CachePort
+	eventEmitter port.EventEmitterPort
+	scanner      *usecase.ScanUseCase
 }
 
-func NewAPI(ctx context.Context) *API {
-	fs := service.NewLocalFileSystem()
+func NewAPI(cache port.CachePort, eventEmitter port.EventEmitterPort, scanner *usecase.ScanUseCase) *API {
 	return &API{
-		fs:    fs,
-		cache: make(map[string]*entity.DirEntry),
-		ctx:   ctx,
+		cache:        cache,
+		eventEmitter: eventEmitter,
+		scanner:      scanner,
 	}
 }
 
-func (a *API) SetContext(ctx context.Context) {
-	a.ctx = ctx
-}
-
 func (a *API) Scan(path string) (*entity.DirEntry, error) {
-	scanner := usecase.NewScanUseCase(a.fs)
 	result := &entity.DirEntry{
 		ID:       uuid.New().String(),
 		ScanDate: time.Now().Format(time.RFC3339),
 		Status:   "IN-PROGRESS",
+		Path:     path,
 	}
-	a.mu.Lock()
-	a.cache[path] = result
-	a.mu.Unlock()
+	a.cache.Set(result.ID, result)
+	a.eventEmitter.Emit("scan-status-updated", map[string]string{"id": result.ID, "status": result.Status})
 
-	a.UpdateScanStatus(result.ID, result.Status)
-
-	scanResult, err := scanner.Scan(path)
-	scanResult.ID = result.ID
+	scanResult, err := a.scanner.Scan(path)
 	if err == nil {
 		scanResult.ID = result.ID
 		scanResult.ScanDate = result.ScanDate
 		scanResult.Status = "COMPLETED"
-		result = scanResult
+		a.cache.Set(scanResult.ID, scanResult)
+		a.eventEmitter.Emit("scan-status-updated", map[string]string{"id": scanResult.ID, "status": scanResult.Status})
 	}
 
-	a.mu.Lock()
-	a.cache[path] = result
-	a.mu.Unlock()
-
-	a.UpdateScanStatus(result.ID, result.Status)
-
-	return result, err
+	return scanResult, err
 }
 
 func (a *API) ScanNonRecursive(path string) (*entity.DirEntry, error) {
-	scanner := usecase.NewScanUseCase(a.fs)
-	return scanner.ScanNonRecursive(path)
+	return a.scanner.ScanNonRecursive(path)
 }
 
 func (a *API) ListScans() []entity.ScanSummary {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
-
-	scans := make([]entity.ScanSummary, 0, len(a.cache))
-	for path, entry := range a.cache {
-		scans = append(scans, entity.ScanSummary{
-			ID:       entry.ID,
-			ScanDate: entry.ScanDate,
-			Path:     path,
-			Status:   entry.Status,
-		})
+	scans := make([]entity.ScanSummary, 0)
+	for _, key := range a.cache.Keys() {
+		if entry, exists := a.cache.Get(key); exists {
+			dirEntry, ok := entry.(*entity.DirEntry)
+			if !ok {
+				continue // Skip entries that are not of type *entity.DirEntry
+			}
+			scans = append(scans, entity.ScanSummary{
+				ID:       dirEntry.ID,
+				ScanDate: dirEntry.ScanDate,
+				Path:     dirEntry.Path,
+				Status:   dirEntry.Status,
+			})
+		}
 	}
 	return scans
 }
 
 func (a *API) GetScan(id string) *entity.DirEntry {
-	a.mu.RLock()
-	defer a.mu.RUnlock()
-	for _, entry := range a.cache {
-		if entry.ID == id {
-			return entry
-		}
+	entry, exists := a.cache.Get(id)
+	if !exists {
+		log.Printf("Scan with ID %s not found", id)
+		return nil
 	}
-	return nil
-}
-
-func (a *API) UpdateScanStatus(id string, status string) {
-	runtime.EventsEmit(a.ctx, "scan-status-updated", map[string]string{"id": id, "status": status})
+	dirEntry, ok := entry.(*entity.DirEntry)
+	if !ok {
+		log.Printf("Entry with ID %s is not a DirEntry", id)
+		return nil
+	}
+	return dirEntry
 }
