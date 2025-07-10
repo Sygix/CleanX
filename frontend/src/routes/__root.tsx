@@ -4,6 +4,7 @@ import bg from '../assets/images/w11.png';
 import Menu from '../components/layout/Menu';
 
 export const Route = createRootRoute({
+  loader: () => void 0,
   component: () => (
     <main className="text-carbon-800 relative inset-0 h-screen min-h-screen">
       <img

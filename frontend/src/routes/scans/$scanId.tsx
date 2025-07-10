@@ -2,6 +2,23 @@ import { createFileRoute } from '@tanstack/react-router';
 import FolderExplorer from '../../components/explorer/FolderExplorer';
 import { formatDuration } from '../../utils/formatDuration';
 import { GetScan } from '../../../wailsjs/go/main/App';
+import * as React from 'react';
+
+const Shimmer = () => (
+  <div className="flex h-full flex-col gap-5 overflow-scroll p-5">
+    <div className="animate-pulse space-y-4">
+      <div className="h-6 w-1/3 bg-neutral-300 rounded" />
+      <div className="grid grid-cols-2 gap-2.5">
+        <div className="h-4 bg-neutral-200 rounded col-span-1" />
+        <div className="h-4 bg-neutral-200 rounded col-span-1" />
+        <div className="h-4 bg-neutral-200 rounded col-span-1" />
+        <div className="h-4 bg-neutral-200 rounded col-span-1" />
+        <div className="h-4 bg-neutral-200 rounded col-span-1" />
+      </div>
+      <div className="h-64 bg-neutral-100 rounded" />
+    </div>
+  </div>
+);
 
 const ScanId = () => {
   const tree = Route.useLoaderData();
@@ -27,6 +44,9 @@ const ScanId = () => {
 
 export const Route = createFileRoute('/scans/$scanId')({
   component: ScanId,
+  pendingMs: 0,
+  pendingMinMs: 400,
+  pendingComponent: Shimmer,
   loader: async ({ params }) => {
     const entry = await GetScan(params.scanId);
     return entry;
