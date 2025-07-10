@@ -73,14 +73,14 @@ function Index() {
           </Button>
         </div>
       </div>
-      {loading || !selectedDrive ? (
+      {loading ? (
         <label className='text-neutral-600 text-sm'>Chargement des disques...</label>
       ) : (
         <div className="flex flex-col gap-1.5 text-neutral-600 text-sm">
           <label htmlFor="drive-select">Disque source :</label>
           <select
             id="drive-select"
-            value={selectedDrive}
+            value={selectedDrive ?? ''}
             onChange={handleDriveChange}
             disabled={loading}
             className='bg-white border border-neutral-300 rounded-md p-2.5'
