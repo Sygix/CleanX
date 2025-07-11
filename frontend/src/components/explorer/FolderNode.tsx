@@ -53,17 +53,12 @@ const FolderNode = ({
     try {
       const deletionRequest = entity.DeletionRequest.createFrom({
         paths: [entry.path],
-        force: entry.isDir, // Force deletion for directories
+        force: entry.isDir,
       });
       
       const result = await DeleteItems(deletionRequest);
       
-      if (result.successCount > 0) {
-        // Emit a custom event to notify parent components about the deletion
-        window.dispatchEvent(new CustomEvent('itemDeleted', { 
-          detail: { path: entry.path, summary: result } 
-        }));
-      } else {
+      if (result.successCount <= 0)  {
         alert(`Erreur lors de la suppression : ${result.results[0]?.error || 'Erreur inconnue'}`);
       }
     } catch (error) {
