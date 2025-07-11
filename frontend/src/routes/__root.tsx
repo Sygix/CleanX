@@ -2,7 +2,7 @@ import { createRootRoute, Outlet } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import bg from '../assets/images/w11.png';
 import Menu from '../components/layout/Menu';
-import LatestScans from '../components/LatestScans';
+import LatestEvents from '../components/LatestEvents';
 import DiskGauge from '../components/DiskGauge';
 
 export const Route = createRootRoute({
@@ -23,7 +23,7 @@ export const Route = createRootRoute({
         </div>
         <div className="flex h-full w-72 shrink-0 flex-col gap-6">
           <DiskGauge />
-          <LatestScans />
+          <LatestEvents />
         </div>
       </div>
       <TanStackRouterDevtools />

@@ -1,4 +1,4 @@
-import { useCallback, useState, useMemo } from 'react';
+import { useCallback, useState, useMemo, useEffect } from 'react';
 import { IconArrowUp, IconArrowDown, IconFilter, IconMenuOrder } from '@tabler/icons-react';
 import { entity } from '../../../wailsjs/go/models';
 import FolderNode from './FolderNode';
@@ -11,6 +11,7 @@ interface FolderExplorerProps {
   showSize?: boolean;
   showFiles?: boolean;
   showFilters?: boolean;
+  allowDelete?: boolean;
   explorerKey: string;
 }
 
@@ -34,6 +35,7 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({
   showSize,
   showFiles,
   showFilters = false,
+  allowDelete = false,
   explorerKey,
 }) => {
   const { getExplorer } = useExplorerStore((state) => state);
@@ -42,6 +44,44 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({
   const setTree = useExplorerStore((state) => state.setTree);
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>('desc');
   const [sizeRangeFilter, setSizeRangeFilter] = useState<string>('all');
+
+  // Listen for deletion events to refresh the tree
+  useEffect(() => {
+    const handleItemDeleted = (event: CustomEvent) => {
+      const { path } = event.detail;
+      
+      // Remove the deleted item from the tree
+      setTree(explorerKey, (prevTree) => {
+        if (!prevTree) return prevTree;
+        
+        const removeDeletedItem = (node: entity.DirEntry): entity.DirEntry | null => {
+          if (node.path === path) {
+            return null; // Mark for removal
+          }
+          
+          if (node.children) {
+            const filteredChildren = node.children
+              .map(removeDeletedItem)
+              .filter((child): child is entity.DirEntry => child !== null);
+            
+            return entity.DirEntry.createFrom({
+              ...node,
+              children: filteredChildren,
+            });
+          }
+          
+          return node;
+        };
+        
+        return removeDeletedItem(prevTree);
+      });
+    };
+
+    window.addEventListener('itemDeleted', handleItemDeleted as EventListener);
+    return () => {
+      window.removeEventListener('itemDeleted', handleItemDeleted as EventListener);
+    };
+  }, [explorerKey, setTree]);
 
   const handleExpand = useCallback(
     async (entry: entity.DirEntry, level: number) => {
@@ -172,6 +212,7 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({
         onExpand={handleExpand}
         showSize={showSize}
         showFiles={showFiles}
+        allowDelete={allowDelete}
       />
     </div>
   );

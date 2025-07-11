@@ -34,7 +34,15 @@ func (a *API) Scan(path string) (*entity.DirEntry, error) {
 		Path:     path,
 	}
 	a.cache.Set(result.ID, result)
-	a.eventEmitter.Emit("scan-status-updated", map[string]string{"id": result.ID, "status": result.Status})
+
+	// Emit scan summary instead of just map
+	scanSummary := entity.ScanSummary{
+		ID:       result.ID,
+		ScanDate: result.ScanDate,
+		Path:     result.Path,
+		Status:   result.Status,
+	}
+	a.eventEmitter.Emit("scan-status-updated", scanSummary)
 
 	scanResult, err := a.scanner.Scan(path)
 	if err == nil {
@@ -42,7 +50,15 @@ func (a *API) Scan(path string) (*entity.DirEntry, error) {
 		scanResult.ScanDate = result.ScanDate
 		scanResult.Status = "COMPLETED"
 		a.cache.Set(scanResult.ID, scanResult)
-		a.eventEmitter.Emit("scan-status-updated", map[string]string{"id": scanResult.ID, "status": scanResult.Status})
+
+		// Emit completed scan summary
+		completedSummary := entity.ScanSummary{
+			ID:       scanResult.ID,
+			ScanDate: scanResult.ScanDate,
+			Path:     scanResult.Path,
+			Status:   scanResult.Status,
+		}
+		a.eventEmitter.Emit("scan-status-updated", completedSummary)
 	}
 
 	return scanResult, err

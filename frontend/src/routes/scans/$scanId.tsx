@@ -47,7 +47,7 @@ const ScanId = () => {
           <p className="text-sm text-neutral-500">Nombre de fichiers : {tree.totalFiles}</p>
         </div>
       </div>
-      {tree && <FolderExplorer tree={tree} explorerKey={tree.id} showSize={true} showFilters={true} />}
+      {tree && <FolderExplorer tree={tree} explorerKey={tree.id} showSize={true} showFilters={true} allowDelete={true} />}
       {tree && (
         <div className="flex flex-col gap-2.5">
           <button

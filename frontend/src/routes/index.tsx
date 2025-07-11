@@ -25,29 +25,36 @@ function Index() {
     }
   };
 
-  const refreshTree = useCallback(() => {
+  const refreshTree = useCallback(async () => {
     if (!selectedDrive) {
       console.warn('No drive selected for scanning');
       return;
     }
-    ScanNonRecursive(selectedDrive).then((entry) => setTree('index', entry));
+    try {
+      const entry = await ScanNonRecursive(selectedDrive);
+      setTree('index', entry);
+    } catch (error) {
+      console.error('Failed to refresh tree:', error);
+    }
   }, [selectedDrive, setTree]);
 
   const handleDriveChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     const drive = event.target.value;
     setSelectedDrive(drive);
-    refreshTree();
   };
 
   useEffect(() => {
     if (tree) return;
-    if (drives.length === 0) {
-      console.warn('No drives available to scan');
-      return;
+    if (selectedDrive) {
+      refreshTree();
     }
-    setSelectedDrive(drives[0]);
-    refreshTree();
-  }, [drives, refreshTree, tree]);
+  }, [selectedDrive, refreshTree, tree]);
+
+  useEffect(() => {
+    if (drives.length > 0 && !selectedDrive) {
+      setSelectedDrive(drives[0]);
+    }
+  }, [drives, selectedDrive]);
 
   return (
     <div className="flex h-full flex-col gap-5 overflow-auto p-5">
