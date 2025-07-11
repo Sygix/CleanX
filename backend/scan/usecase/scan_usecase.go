@@ -19,9 +19,24 @@ func NewScanUseCase(fs port.FileSystemPort) *ScanUseCase {
 }
 
 func (s *ScanUseCase) Scan(path string) (*entity.DirEntry, error) {
+	defer func() {
+		// Recover from any panics that might occur during scanning
+		if r := recover(); r != nil {
+			log.Printf("Recovered from panic while scanning %s: %v", path, r)
+		}
+	}()
+
 	rootInfo, err := s.fs.GetInfo(path)
 	if err != nil {
-		return nil, err
+		log.Printf("Warning: Cannot access path %s: %v", path, err)
+		// Return a minimal entry instead of failing completely
+		return &entity.DirEntry{
+			Name:     filepath.Base(path),
+			Path:     path,
+			Size:     0,
+			IsDir:    true,
+			Children: []*entity.DirEntry{},
+		}, nil
 	}
 	if !rootInfo.IsDir {
 		return nil, nil
@@ -31,6 +46,13 @@ func (s *ScanUseCase) Scan(path string) (*entity.DirEntry, error) {
 }
 
 func (s *ScanUseCase) ScanNonRecursive(path string) (*entity.DirEntry, error) {
+	defer func() {
+		// Recover from any panics that might occur during scanning
+		if r := recover(); r != nil {
+			log.Printf("Recovered from panic while scanning non-recursive %s: %v", path, r)
+		}
+	}()
+
 	return s.buildDirEntry(path, false)
 }
 
@@ -48,7 +70,9 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 	entries, err := s.fs.ReadDir(path)
 	if err != nil {
 		log.Printf("Error reading directory %s: %v", path, err)
-		return nil, err
+		// Instead of returning error, return partial results with empty children
+		root.Elapsed = time.Since(start)
+		return root, nil
 	}
 
 	if !recursive {
@@ -80,16 +104,36 @@ func (s *ScanUseCase) buildDirEntry(path string, recursive bool) (*entity.DirEnt
 			wg.Add(1)
 			go func(e entity.DirEntry) {
 				defer wg.Done()
+				defer func() {
+					// Recover from any panics that might occur during scanning
+					if r := recover(); r != nil {
+						log.Printf("Recovered from panic while scanning %s: %v", e.Path, r)
+					}
+				}()
+
 				subDir, err := s.buildDirEntry(e.Path, recursive)
-				if err == nil && subDir != nil {
+				if err != nil {
+					// Log error but continue with other directories
+					log.Printf("Error scanning subdirectory %s: %v - continuing with scan", e.Path, err)
+					// Create a placeholder entry for the problematic directory
+					subDir = &entity.DirEntry{
+						Name:       e.Name,
+						Path:       e.Path,
+						Size:       0,
+						IsDir:      true,
+						TotalDirs:  0,
+						TotalFiles: 0,
+						Children:   nil,
+					}
+				}
+
+				if subDir != nil {
 					mu.Lock()
 					root.Children = append(root.Children, subDir)
 					root.Size += subDir.Size
 					root.TotalDirs += subDir.TotalDirs + 1
 					root.TotalFiles += subDir.TotalFiles
 					mu.Unlock()
-				} else if err != nil {
-					log.Printf("Error scanning subdirectory %s: %v", e.Path, err)
 				}
 			}(entry)
 		} else {
