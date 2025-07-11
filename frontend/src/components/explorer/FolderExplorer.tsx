@@ -1,9 +1,10 @@
 import { useCallback, useState, useMemo } from 'react';
-import { IconArrowUp, IconArrowDown, IconFilter } from '@tabler/icons-react';
+import { IconArrowUp, IconArrowDown, IconFilter, IconMenuOrder } from '@tabler/icons-react';
 import { entity } from '../../../wailsjs/go/models';
 import FolderNode from './FolderNode';
 import { useExplorerStore } from '../../store/explorerStore';
 import { ScanNonRecursive } from '../../../wailsjs/go/main/App';
+import clsxm from '../../utils/clsxm';
 
 interface FolderExplorerProps {
   tree: entity.DirEntry;
@@ -122,14 +123,14 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({
       </div>
 
       {showFilters && (
-        <div className="flex flex-col gap-2 p-2 bg-gray-50 rounded">
-          <div className="flex items-center gap-2">
-            <IconFilter size={16} />
-            <span className="text-sm font-medium">Filtrer par taille:</span>
+        <div className="flex flex-wrap gap-2 p-2.5">
+          <div className="flex items-center gap-2.5 text-sm">
+            <IconFilter />
+            <span>Filtrer par taille:</span>
             <select
               value={sizeRangeFilter}
               onChange={(e) => setSizeRangeFilter(e.target.value)}
-              className="px-2 py-1 text-xs border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="rounded-md border border-neutral-300 bg-white p-1"
             >
               {ranges.map((range) => (
                 <option key={range.value} value={range.value}>
@@ -139,39 +140,26 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({
             </select>
           </div>
           
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium">Trier par taille:</span>
-            <button
-              onClick={() => setSizeFilter('none')}
-              className={`px-2 py-1 text-xs rounded ${
-                sizeFilter === 'none'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
-              }`}
-            >
-              Aucun
-            </button>
+          <div className="flex items-center gap-2.5 text-sm">
+            <IconMenuOrder />
+            <span>Trier par taille:</span>
             <button
               onClick={() => setSizeFilter('asc')}
-              className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${
-                sizeFilter === 'asc'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
-              }`}
+              className={clsxm('py-1 px-2 rounded-md flex items-center gap-1', sizeFilter === 'asc'
+                ? 'bg-primary-500 text-white'
+                : 'bg-gray-200 hover:bg-gray-300')}
             >
-              <IconArrowUp size={12} />
-              Croissant
+              <IconArrowUp size={16} />
+              <span>Croissant</span>
             </button>
             <button
               onClick={() => setSizeFilter('desc')}
-              className={`px-2 py-1 text-xs rounded flex items-center gap-1 ${
-                sizeFilter === 'desc'
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-200 hover:bg-gray-300'
-              }`}
+              className={clsxm('py-1 px-2 rounded-md flex items-center gap-1', sizeFilter === 'desc'
+                ? 'bg-primary-500 text-white'
+                : 'bg-gray-200 hover:bg-gray-300')}
             >
-              <IconArrowDown size={12} />
-              Décroissant
+              <IconArrowDown size={16} />
+              <span>Décroissant</span>
             </button>
           </div>
         </div>

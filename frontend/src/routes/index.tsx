@@ -86,7 +86,7 @@ function Index() {
           </select>
         </div>
       )}
-      {!loading && tree && <FolderExplorer tree={tree} explorerKey="index" showFiles={false} />}
+      {!loading && tree && <FolderExplorer tree={tree} explorerKey="index" showFiles={false} showFilters={true} />}
     </div>
   );
 }
