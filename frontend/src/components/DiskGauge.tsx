@@ -40,10 +40,10 @@ const DiskGauge = () => {
           trailColor: '#c6dbf1',
         })}
       >
-        <div className="text-xl font-bold text-primary-600">
+        <div className="text-3xl font-bold text-primary-600">
           {convertBytes(used)}
         </div>
-        <div className="text-xs text-primary-200">
+        <div className="text-primary-300">
           / {convertBytes(total)}
         </div>
       </CircularProgressbarWithChildren>

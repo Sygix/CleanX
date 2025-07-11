@@ -40,7 +40,7 @@ const FolderExplorer: React.FC<FolderExplorerProps> = ({
   const { expandedPaths = [], selectedPath } = getExplorer(explorerKey);
   const setExpandedPaths = useExplorerStore((state) => state.setExpandedPaths);
   const setTree = useExplorerStore((state) => state.setTree);
-  const [sizeFilter, setSizeFilter] = useState<SizeFilter>('none');
+  const [sizeFilter, setSizeFilter] = useState<SizeFilter>('desc');
   const [sizeRangeFilter, setSizeRangeFilter] = useState<string>('all');
 
   const handleExpand = useCallback(
